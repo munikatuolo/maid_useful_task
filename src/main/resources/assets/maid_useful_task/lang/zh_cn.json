@@ -3,6 +3,8 @@
   "task.maid_useful_task.maid_tree.desc": "女仆会砍伐身边的原木并种下树苗",
   "task.maid_useful_task.locate": "定位",
   "task.maid_useful_task.locate.desc": "女仆会根据手持物品定位指定的结构或你的出生点",
+  "task.maid_useful_task.maid_mine": "挖矿",
+  "task.maid_useful_task.maid_mine.desc": "女仆会在主人附近挖掘选中的矿物。",
   "task.maid_useful_task.revive_player": "救援玩家",
   "task.maid_useful_task.revive_player.desc": "女仆会救援附近倒地的玩家",
   "key.maid_useful_tasks.switch_vehicle_control": "切换载具控制模式",
@@ -15,5 +17,9 @@
   "gui.maid_useful_task.yes": "是",
   "gui.maid_useful_task.revive.ownerOnly": "只救援主人",
   "gui.maid_useful_task.logging.block_up": "上搭方块",
-  "gui.maid_useful_task.logging.skip_non_nature": "跳过非自然原木"
+  "gui.maid_useful_task.logging.skip_non_nature": "跳过非自然原木",
+  "gui.maid_useful_task.mine.search": "检索矿物",
+  "gui.maid_useful_task.mine.count": "数量",
+  "message.maid_useful_task.mine.no_ore": "附近没有矿石。",
+  "message.maid_useful_task.mine.tool_insufficient": "镐子等级不够，无法挖该矿石。"
 }

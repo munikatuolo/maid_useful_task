@@ -11,9 +11,11 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import studio.fantasyit.maid_useful_task.compat.PlayerRevive;
 import studio.fantasyit.maid_useful_task.data.MaidConfigKeys;
 import studio.fantasyit.maid_useful_task.data.MaidLoggingConfig;
+import studio.fantasyit.maid_useful_task.data.MaidMineConfig;
 import studio.fantasyit.maid_useful_task.data.MaidReviveConfig;
 import studio.fantasyit.maid_useful_task.registry.MemoryModuleRegistry;
 import studio.fantasyit.maid_useful_task.task.MaidLocateTask;
+import studio.fantasyit.maid_useful_task.task.MaidMineTask;
 import studio.fantasyit.maid_useful_task.task.MaidRevivePlayerTask;
 import studio.fantasyit.maid_useful_task.task.MaidTreeTask;
 import studio.fantasyit.maid_useful_task.vehicle.broom.BroomController;
@@ -29,6 +31,8 @@ public class UsefulTaskExtension implements ILittleMaid {
             manager.add(new MaidTreeTask());
         if (Config.enableLocateTask)
             manager.add(new MaidLocateTask());
+        if (Config.enableMineTask)
+            manager.add(new MaidMineTask());
         if (Config.enableReviveTask)
             if (PlayerRevive.isEnable())
                 manager.add(new MaidRevivePlayerTask());
@@ -61,6 +65,9 @@ public class UsefulTaskExtension implements ILittleMaid {
         MaidConfigKeys.addKey(MaidReviveConfig.LOCATION,
                 MaidReviveConfig.KEY = register.register(new MaidReviveConfig()),
                 MaidReviveConfig.Data::getDefault);
+        MaidConfigKeys.addKey(MaidMineConfig.LOCATION,
+                MaidMineConfig.KEY = register.register(new MaidMineConfig()),
+                MaidMineConfig.Data::getDefault);
     }
 
     @Override

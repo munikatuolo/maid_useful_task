@@ -21,6 +21,8 @@ public class Config {
             .define("functions.revive", true);
     private static final ModConfigSpec.BooleanValue ENABLE_LOCATE = BUILDER
             .define("functions.locate", true);
+    private static final ModConfigSpec.BooleanValue ENABLE_MINE = BUILDER
+            .define("functions.mine", true);
 
     private static final ModConfigSpec.BooleanValue ENABLE_REVIVE_AGGRO = BUILDER
             .define("revive.aggro", false);
@@ -42,6 +44,7 @@ public class Config {
     public static boolean enableLoggingTask = false;
     public static boolean enableReviveTask = false;
     public static boolean enableLocateTask = false;
+    public static boolean enableMineTask = false;
 
     public static boolean enableReviveAggro = false;
     public static boolean enableReviveTotem = false;
@@ -57,6 +60,7 @@ public class Config {
         enableLoggingTask = ENABLE_LOGGING.get();
         enableReviveTask = ENABLE_REVIVE.get();
         enableLocateTask = ENABLE_LOCATE.get();
+        enableMineTask = ENABLE_MINE.get();
         enableReviveAggro = ENABLE_REVIVE_AGGRO.get();
         enableReviveTotem = ENABLE_REVIVE_TOTEM.get();
         enableVehicleControlFull = ENABLE_VEHICLE_CONTROL_FULL.get();

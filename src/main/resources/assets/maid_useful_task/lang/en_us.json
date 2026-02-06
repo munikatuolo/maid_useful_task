@@ -3,6 +3,8 @@
   "task.maid_useful_task.maid_tree.desc": "The maid will cut down the logs around her and plant saplings.",
   "task.maid_useful_task.locate": "Locate",
   "task.maid_useful_task.locate.desc": "The maid can locate the some structure or your home with specific items.",
+  "task.maid_useful_task.maid_mine": "Mine Ore",
+  "task.maid_useful_task.maid_mine.desc": "The maid will mine the selected ore near the owner.",
   "task.maid_useful_task.revive_player": "Revive Player",
   "task.maid_useful_task.revive_player.desc": "The maid will revive nearby bleeding player.",
   "key.maid_useful_tasks.switch_vehicle_control": "Switch Vehicle Control Mode",
@@ -15,5 +17,9 @@
   "gui.maid_useful_task.yes": "Yes",
   "gui.maid_useful_task.revive.ownerOnly": "Only revive owner",
   "gui.maid_useful_task.logging.block_up": "Block Up",
-  "gui.maid_useful_task.logging.skip_non_nature": "Skip Non-nature Logs"
+  "gui.maid_useful_task.logging.skip_non_nature": "Skip Non-nature Logs",
+  "gui.maid_useful_task.mine.search": "Search Ore",
+  "gui.maid_useful_task.mine.count": "Count",
+  "message.maid_useful_task.mine.no_ore": "No ores nearby.",
+  "message.maid_useful_task.mine.tool_insufficient": "My pickaxe isn't strong enough to mine that ore."
 }
