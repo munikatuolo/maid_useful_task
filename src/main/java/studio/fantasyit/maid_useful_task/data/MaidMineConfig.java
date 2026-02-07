@@ -17,19 +17,21 @@ public class MaidMineConfig implements TaskDataKey<MaidMineConfig.Data> {
     public static final class Data implements IConfigSetter {
         private String oreId;
         private int targetCount;
+        private int mineRange;
         private int remainingCount;
         private long lastNoOreWarnTick;
         private long lastToolWarnTick;
         private boolean toolInsufficient;
 
-        public Data(String oreId, int targetCount, int remainingCount) {
+        public Data(String oreId, int targetCount, int mineRange, int remainingCount) {
             this.oreId = oreId;
             this.targetCount = targetCount;
+            this.mineRange = mineRange;
             this.remainingCount = remainingCount;
         }
 
         public static Data getDefault() {
-            return new Data("minecraft:iron_ore", 16, 16);
+            return new Data("minecraft:iron_ore", 16, 16, 16);
         }
 
         public String oreId() {
@@ -46,6 +48,14 @@ public class MaidMineConfig implements TaskDataKey<MaidMineConfig.Data> {
 
         public void targetCount(int targetCount) {
             this.targetCount = targetCount;
+        }
+
+        public int mineRange() {
+            return mineRange;
+        }
+
+        public void mineRange(int mineRange) {
+            this.mineRange = mineRange;
         }
 
         public int remainingCount() {
@@ -103,6 +113,9 @@ public class MaidMineConfig implements TaskDataKey<MaidMineConfig.Data> {
                     targetCount = Math.max(1, Integer.parseInt(value));
                     resetRemaining();
                     break;
+                case "mineRange":
+                    mineRange = Math.max(1, Integer.parseInt(value));
+                    break;
                 case "remainingCount":
                     remainingCount = Math.max(0, Integer.parseInt(value));
                     break;
@@ -120,6 +133,7 @@ public class MaidMineConfig implements TaskDataKey<MaidMineConfig.Data> {
         CompoundTag tag = new CompoundTag();
         tag.putString("oreId", data.oreId);
         tag.putInt("targetCount", data.targetCount);
+        tag.putInt("mineRange", data.mineRange);
         tag.putInt("remainingCount", data.remainingCount);
         return tag;
     }
@@ -128,6 +142,7 @@ public class MaidMineConfig implements TaskDataKey<MaidMineConfig.Data> {
     public Data readSaveData(CompoundTag compound) {
         String oreId = compound.getString("oreId");
         int targetCount = compound.getInt("targetCount");
+        int mineRange = compound.contains("mineRange") ? compound.getInt("mineRange") : 16;
         int remainingCount = compound.contains("remainingCount") ? compound.getInt("remainingCount") : targetCount;
         if (oreId.isEmpty()) {
             oreId = "minecraft:iron_ore";
@@ -135,9 +150,12 @@ public class MaidMineConfig implements TaskDataKey<MaidMineConfig.Data> {
         if (targetCount <= 0) {
             targetCount = 16;
         }
+        if (mineRange <= 0) {
+            mineRange = 16;
+        }
         if (remainingCount < 0) {
             remainingCount = 0;
         }
-        return new Data(oreId, targetCount, remainingCount);
+        return new Data(oreId, targetCount, mineRange, remainingCount);
     }
 }
