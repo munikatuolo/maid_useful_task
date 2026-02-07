@@ -135,7 +135,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         private static final int MAX_COUNT = 64;
 
         protected CountSlider(int x, int y, int width, int height, int initialCount) {
-            super(x, y, width, height, Component.empty(), toSliderValue(initialCount));
+            super(x, y, width, height, Component.empty(), toSliderValueStatic(initialCount));
             updateMessage();
         }
 
@@ -162,11 +162,11 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
 
         private void setCount(int count) {
             int clamped = Math.max(MIN_COUNT, Math.min(MAX_COUNT, count));
-            this.value = toSliderValue(clamped);
+            this.value = toSliderValueStatic(clamped);
             updateMessage();
         }
 
-        private double toSliderValue(int count) {
+        private static double toSliderValueStatic(int count) {
             int clamped = Math.max(MIN_COUNT, Math.min(MAX_COUNT, count));
             return (clamped - MIN_COUNT) / (double) (MAX_COUNT - MIN_COUNT);
         }
