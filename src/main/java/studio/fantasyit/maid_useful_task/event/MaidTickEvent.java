@@ -7,7 +7,7 @@ import studio.fantasyit.maid_useful_task.MaidUsefulTask;
 import studio.fantasyit.maid_useful_task.task.IMaidVehicleControlTask;
 import studio.fantasyit.maid_useful_task.vehicle.MaidVehicleManager;
 
-@EventBusSubscriber(modid = MaidUsefulTask.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = MaidUsefulTask.MODID)
 public class MaidTickEvent {
     @SubscribeEvent
     public static void onTick(com.github.tartaricacid.touhoulittlemaid.api.event.MaidTickEvent event) {

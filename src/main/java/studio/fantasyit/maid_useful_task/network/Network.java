@@ -26,7 +26,7 @@ public class Network {
         );
     }
 
-    @EventBusSubscriber(modid = MaidUsefulTask.MODID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = MaidUsefulTask.MODID)
     public static class Event {
         @net.neoforged.bus.api.SubscribeEvent
         public static void regis(RegisterPayloadHandlersEvent event) {
