@@ -19,6 +19,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.items.wrapper.RangedWrapper;
+import studio.fantasyit.maid_useful_task.util.MemoryUtil;
 
 import java.lang.reflect.Method;
 import java.util.function.Predicate;
@@ -106,6 +107,13 @@ public class MaidUtils {
         trySendChatBubble(maid, message);
     }
 
+    public static void switchToIdleTask(EntityMaid maid) {
+        MemoryUtil.clearDestroyTargetMemory(maid);
+        MemoryUtil.clearTarget(maid);
+        MemoryUtil.setCurrent(maid, studio.fantasyit.maid_useful_task.memory.CurrentWork.IDLE);
+        trySetIdleTask(maid);
+    }
+
     private static void trySendChatBubble(EntityMaid maid, net.minecraft.network.chat.Component message) {
         String[] methodNames = new String[]{"setChatBubble", "setChatBubbleMessage", "setChatBubbleText"};
         for (String methodName : methodNames) {
@@ -129,5 +137,24 @@ public class MaidUtils {
         } catch (ReflectiveOperationException ignored) {
             return false;
         }
+    }
+
+    private static void trySetIdleTask(EntityMaid maid) {
+        String[] methodNames = new String[]{"setTask", "setTaskUid", "setTaskByUid"};
+        for (String methodName : methodNames) {
+            if (invokeIdleTaskMethod(maid, methodName)) {
+                return;
+            }
+        }
+    }
+
+    private static boolean invokeIdleTaskMethod(EntityMaid maid, String methodName) {
+        try {
+            Method method = maid.getClass().getMethod(methodName, net.minecraft.resources.ResourceLocation.class);
+            method.invoke(maid, net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("touhou_little_maid", "idle"));
+            return true;
+        } catch (ReflectiveOperationException ignored) {
+        }
+        return false;
     }
 }
