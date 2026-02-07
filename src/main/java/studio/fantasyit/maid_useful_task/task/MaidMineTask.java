@@ -2,6 +2,7 @@ package studio.fantasyit.maid_useful_task.task;
 
 import com.github.tartaricacid.touhoulittlemaid.api.task.IMaidTask;
 import com.github.tartaricacid.touhoulittlemaid.entity.passive.EntityMaid;
+import com.github.tartaricacid.touhoulittlemaid.entity.task.TaskManager;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -148,7 +149,7 @@ public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
             MaidMineConfig.Data data = MaidMineConfig.get(maid);
             data.consumeOne();
             if (data.remainingCount() <= 0) {
-                MaidUtils.switchToIdleTask(maid);
+                maid.setTask(TaskManager.getIdleTask());
             }
         }
         return true;
