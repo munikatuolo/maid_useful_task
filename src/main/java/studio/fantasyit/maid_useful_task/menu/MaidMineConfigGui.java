@@ -121,6 +121,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         currentData.oreId(id.toString());
         currentData.resetRemaining();
         MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "oreId", id.toString());
+        MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "remainingCount", String.valueOf(currentData.targetCount()));
     }
 
     private class CountSlider extends AbstractSliderButton {
@@ -145,6 +146,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 currentData.targetCount(count);
                 currentData.resetRemaining();
                 MaidConfigurePacket.send(MaidMineConfigGui.this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(count));
+                MaidConfigurePacket.send(MaidMineConfigGui.this.maid, MaidMineConfig.LOCATION, "remainingCount", String.valueOf(count));
             }
         }
 
