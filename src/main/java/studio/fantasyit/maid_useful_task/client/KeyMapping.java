@@ -9,7 +9,7 @@ import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 import studio.fantasyit.maid_useful_task.MaidUsefulTask;
 
-@EventBusSubscriber(modid = MaidUsefulTask.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = MaidUsefulTask.MODID, value = Dist.CLIENT)
 public class KeyMapping {
 
     public static final Lazy<net.minecraft.client.KeyMapping> KEY_SWITCH_VEHICLE_CONTROL = Lazy.of(() -> new net.minecraft.client.KeyMapping(

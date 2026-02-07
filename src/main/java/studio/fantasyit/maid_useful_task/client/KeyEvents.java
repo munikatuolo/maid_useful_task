@@ -14,7 +14,7 @@ import studio.fantasyit.maid_useful_task.network.MaidAllowHandleVehicle;
 
 import static studio.fantasyit.maid_useful_task.client.KeyMapping.KEY_SWITCH_VEHICLE_CONTROL;
 
-@EventBusSubscriber(modid = MaidUsefulTask.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = MaidUsefulTask.MODID, value = Dist.CLIENT)
 public class KeyEvents {
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)

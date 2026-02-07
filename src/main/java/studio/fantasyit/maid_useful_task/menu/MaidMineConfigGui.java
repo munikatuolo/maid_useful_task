@@ -6,13 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
 import studio.fantasyit.maid_useful_task.data.MaidMineConfig;
 import studio.fantasyit.maid_useful_task.network.MaidConfigurePacket;
@@ -68,7 +69,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         this.countBox.setResponder(this::updateCount);
         this.addRenderableWidget(this.countBox);
 
-        this.oreList = new OreList(this.minecraft, LIST_WIDTH, LIST_HEIGHT, top + 24, top + 24 + LIST_HEIGHT, 18);
+        // 修改：构造函数只传 5 个参数，去掉了用不到的 bottom (top + 24 + LIST_HEIGHT)
+        this.oreList = new OreList(this.minecraft, LIST_WIDTH, LIST_HEIGHT, top + 24, 18);
         this.oreList.setLeftPos(left);
         this.oreList.refreshList("");
         this.addRenderableWidget(this.oreList);
@@ -112,9 +114,18 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "oreId", id.toString());
     }
 
-    private class OreList extends ObjectSelectionList<OreEntry> {
-        public OreList(Minecraft minecraft, int width, int height, int yStart, int yEnd, int itemHeight) {
-            super(minecraft, width, height, yStart, yEnd, itemHeight);
+    // ==========================================
+    // OreList 类
+    // ==========================================
+    private class OreList extends ObjectSelectionList<OreList.OreEntry> {
+        // 修改：移除了 bottom 参数
+        public OreList(Minecraft minecraft, int width, int height, int top, int itemHeight) {
+            super(minecraft, width, height, top, itemHeight);
+        }
+
+
+        public void setLeftPos(int left) {
+            this.setX(left); // 使用 setX
         }
 
         public void refreshList(String filter) {
@@ -125,7 +136,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 if (block == Blocks.AIR) {
                     continue;
                 }
-                if (!block.defaultBlockState().is(BlockTags.ORES)) {
+                // 修复：使用 NeoForge 的 Tags.Blocks.ORES
+                if (!block.defaultBlockState().is(Tags.Blocks.ORES)) {
                     continue;
                 }
                 ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
@@ -141,30 +153,41 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 this.addEntry(entry);
                 if (entry.id.toString().equals(currentData.oreId())) {
                     this.setSelected(entry);
+                    this.centerScrollOn(entry); // 自动滚动到选中项
                 }
             }
         }
-    }
 
-    private class OreEntry extends ObjectSelectionList.Entry<OreEntry> {
-        private final ResourceLocation id;
-        private final Component name;
+        // ==========================================
+        // OreEntry 类 (移到 OreList 内部)
+        // ==========================================
+        public class OreEntry extends ObjectSelectionList.Entry<OreEntry> {
+            private final ResourceLocation id;
+            private final Component name;
 
-        public OreEntry(ResourceLocation id, Component name) {
-            this.id = id;
-            this.name = name;
-        }
+            public OreEntry(ResourceLocation id, Component name) {
+                this.id = id;
+                this.name = name;
+            }
 
-        @Override
-        public void render(@NotNull GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
-            guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 2, y + 2, 0xFFFFFF, false);
-        }
+            // [新增] 必须实现这个方法，否则报错
+            // 返回该条目的名字，供旁白系统朗读
+            @Override
+            public Component getNarration() {
+                return this.name;
+            }
 
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            MaidMineConfigGui.this.oreList.setSelected(this);
-            MaidMineConfigGui.this.selectOre(id);
-            return true;
+            @Override
+            public void render(@NotNull GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
+                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 2, y + 2, 0xFFFFFF, false);
+            }
+
+            @Override
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                OreList.this.setSelected(this);
+                MaidMineConfigGui.this.selectOre(id);
+                return true;
+            }
         }
     }
 }
