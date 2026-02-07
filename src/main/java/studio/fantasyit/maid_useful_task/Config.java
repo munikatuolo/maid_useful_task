@@ -23,6 +23,8 @@ public class Config {
             .define("functions.locate", true);
     private static final ModConfigSpec.BooleanValue ENABLE_MINE = BUILDER
             .define("functions.mine", true);
+    private static final ModConfigSpec.IntValue MINE_RANGE = BUILDER
+            .defineInRange("mine.range", 16, 1, 128);
 
     private static final ModConfigSpec.BooleanValue ENABLE_REVIVE_AGGRO = BUILDER
             .define("revive.aggro", false);
@@ -45,6 +47,7 @@ public class Config {
     public static boolean enableReviveTask = false;
     public static boolean enableLocateTask = false;
     public static boolean enableMineTask = false;
+    public static int mineRange = 16;
 
     public static boolean enableReviveAggro = false;
     public static boolean enableReviveTotem = false;
@@ -61,6 +64,7 @@ public class Config {
         enableReviveTask = ENABLE_REVIVE.get();
         enableLocateTask = ENABLE_LOCATE.get();
         enableMineTask = ENABLE_MINE.get();
+        mineRange = MINE_RANGE.get();
         enableReviveAggro = ENABLE_REVIVE_AGGRO.get();
         enableReviveTotem = ENABLE_REVIVE_TOTEM.get();
         enableVehicleControlFull = ENABLE_VEHICLE_CONTROL_FULL.get();

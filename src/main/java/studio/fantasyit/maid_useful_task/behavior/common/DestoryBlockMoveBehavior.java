@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import studio.fantasyit.maid_useful_task.memory.CurrentWork;
 import studio.fantasyit.maid_useful_task.task.IMaidBlockDestroyTask;
+import studio.fantasyit.maid_useful_task.task.MaidMineTask;
 import studio.fantasyit.maid_useful_task.util.Conditions;
 import studio.fantasyit.maid_useful_task.util.MemoryUtil;
 import studio.fantasyit.maid_useful_task.util.PosUtils;
@@ -55,6 +56,11 @@ public class DestoryBlockMoveBehavior extends MaidCenterMoveToBlockTask {
         targetPos = blockPos.immutable();
         BlockPos startPos = entityMaid.blockPosition();
         if (blockPos instanceof BlockPos.MutableBlockPos mb) {
+            List<BlockPos> bestList = null;
+            BlockPos bestPos = null;
+            int bestObstacleCount = Integer.MAX_VALUE;
+            boolean bestAdjacentSamePlane = false;
+            double bestDistance = Double.MAX_VALUE;
             for (int dx = 0; dx < task.reachDistance(); dx = dx <= 0 ? 1 - dx : -dx) {
                 for (int dy = 0; dy < task.reachDistance(); dy = dy <= 0 ? 1 - dy : -dy) {
                     for (int dz = 0; dz < task.reachDistance(); dz = dz <= 0 ? 1 - dz : -dz) {
@@ -66,14 +72,32 @@ public class DestoryBlockMoveBehavior extends MaidCenterMoveToBlockTask {
                         if (Math.abs(startPos.getX() - pos.getX()) >= task.reachDistance()) continue;
                         if (Math.abs(startPos.getZ() - pos.getZ()) >= task.reachDistance()) continue;
                         if (pos.equals(entityMaid.blockPosition()) || (entityMaid.isWithinRestriction(pos) && pathfindingBFS.canPathReach(pos))) {
-                            blockPosSet = task.toDestroyFromStanding(entityMaid, targetPos, pos);
-                            if (blockPosSet != null) {
-                                mb.set(pos);
-                                return true;
+                            List<BlockPos> candidate = task.toDestroyFromStanding(entityMaid, targetPos, pos);
+                            if (candidate != null) {
+                                int obstacleCount = Math.max(0, candidate.size() - 1);
+                                boolean adjacentSamePlane = false;
+                                if (task instanceof MaidMineTask mineTask) {
+                                    adjacentSamePlane = mineTask.hasSamePlaneAdjacentOre(entityMaid, targetPos);
+                                }
+                                double distance = pos.distSqr(entityMaid.blockPosition());
+                                if (adjacentSamePlane && !bestAdjacentSamePlane
+                                        || (adjacentSamePlane == bestAdjacentSamePlane && obstacleCount < bestObstacleCount)
+                                        || (adjacentSamePlane == bestAdjacentSamePlane && obstacleCount == bestObstacleCount && distance < bestDistance)) {
+                                    bestAdjacentSamePlane = adjacentSamePlane;
+                                    bestObstacleCount = obstacleCount;
+                                    bestDistance = distance;
+                                    bestList = candidate;
+                                    bestPos = pos.immutable();
+                                }
                             }
                         }
                     }
                 }
+            }
+            if (bestPos != null) {
+                blockPosSet = bestList;
+                mb.set(bestPos);
+                return true;
             }
         }
         targetPos = null;

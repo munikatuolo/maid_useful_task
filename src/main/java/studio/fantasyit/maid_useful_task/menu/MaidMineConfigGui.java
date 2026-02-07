@@ -4,12 +4,14 @@ import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.task.Maid
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.task.TaskConfigContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -29,9 +31,15 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     private static final int LIST_WIDTH = 154;
     private static final int TEXT_BOX_WIDTH = 120;
     private static final int TEXT_BOX_HEIGHT = 16;
+    private static final int RANGE_BOX_WIDTH = 30;
+    private static final int START_LEFT_OFFSET = 87;
+    private static final int START_TOP_OFFSET = 36;
+    private static final int SLIDER_HEIGHT = 20;
+    private static final int LIST_TOP_OFFSET = 46;
     private MaidMineConfig.Data currentData;
     private EditBox searchBox;
-    private EditBox countBox;
+    private EditBox rangeBox;
+    private CountSlider countSlider;
     private OreList oreList;
     private int lastSentCount;
 
@@ -53,8 +61,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     @Override
     protected void initAdditionWidgets() {
         super.initAdditionWidgets();
-        int left = leftPos + 8;
-        int top = topPos + 24;
+        int left = leftPos + START_LEFT_OFFSET;
+        int top = topPos + START_TOP_OFFSET;
 
         this.searchBox = new EditBox(this.font, left, top, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.search"));
         this.searchBox.setMaxLength(64);
@@ -62,15 +70,19 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         this.searchBox.setResponder(this::updateFilter);
         this.addRenderableWidget(this.searchBox);
 
-        this.countBox = new EditBox(this.font, left + TEXT_BOX_WIDTH + 8, top, 30, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.count"));
-        this.countBox.setMaxLength(4);
-        this.countBox.setValue(String.valueOf(this.currentData.targetCount()));
+        this.rangeBox = new EditBox(this.font, left + TEXT_BOX_WIDTH + 8, top, RANGE_BOX_WIDTH, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.range"));
+        this.rangeBox.setMaxLength(4);
+        this.rangeBox.setValue(String.valueOf(this.currentData.mineRange()));
+        this.rangeBox.setResponder(this::updateRange);
+        this.addRenderableWidget(this.rangeBox);
         this.lastSentCount = this.currentData.targetCount();
-        this.countBox.setResponder(this::updateCount);
-        this.addRenderableWidget(this.countBox);
 
-        // 修改：构造函数只传 5 个参数，去掉了用不到的 bottom (top + 24 + LIST_HEIGHT)
-        this.oreList = new OreList(this.minecraft, LIST_WIDTH, LIST_HEIGHT, top + 24, 18);
+        int sliderWidth = TEXT_BOX_WIDTH + 8 + RANGE_BOX_WIDTH;
+        this.countSlider = new CountSlider(left, top + 20, sliderWidth, SLIDER_HEIGHT, this.currentData.targetCount());
+        this.addRenderableWidget(this.countSlider);
+
+        // 修改：构造函数只传 5 个参数，去掉了用不到的 bottom (top + LIST_TOP_OFFSET + LIST_HEIGHT)
+        this.oreList = new OreList(this.minecraft, LIST_WIDTH, LIST_HEIGHT, top + LIST_TOP_OFFSET, 18);
         this.oreList.setLeftPos(left);
         this.oreList.refreshList("");
         this.addRenderableWidget(this.oreList);
@@ -79,8 +91,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     @Override
     protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawString(this.font, Component.translatable("gui.maid_useful_task.mine.search"), 8, 8, 0x404040, false);
-        guiGraphics.drawString(this.font, Component.translatable("gui.maid_useful_task.mine.count"), 8 + TEXT_BOX_WIDTH + 8, 8, 0x404040, false);
+        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.search"), START_LEFT_OFFSET + TEXT_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
+        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.range"), START_LEFT_OFFSET + TEXT_BOX_WIDTH + 8 + RANGE_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
     }
 
     private void updateFilter(String value) {
@@ -89,7 +101,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         }
     }
 
-    private void updateCount(String value) {
+    private void updateRange(String value) {
         if (value == null || value.isBlank()) {
             return;
         }
@@ -98,12 +110,9 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
             if (parsed <= 0) {
                 return;
             }
-            if (parsed != lastSentCount) {
-                lastSentCount = parsed;
-                currentData.targetCount(parsed);
-                currentData.resetRemaining();
-                MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(parsed));
-            }
+            parsed = Math.min(parsed, 128);
+            currentData.mineRange(parsed);
+            MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "mineRange", String.valueOf(parsed));
         } catch (NumberFormatException ignored) {
         }
     }
@@ -112,6 +121,49 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         currentData.oreId(id.toString());
         currentData.resetRemaining();
         MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "oreId", id.toString());
+        MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "remainingCount", String.valueOf(currentData.targetCount()));
+    }
+
+    private class CountSlider extends AbstractSliderButton {
+        private static final int MIN_COUNT = 1;
+        private static final int MAX_COUNT = 64;
+
+        protected CountSlider(int x, int y, int width, int height, int initialCount) {
+            super(x, y, width, height, Component.empty(), toSliderValueStatic(initialCount));
+            updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            this.setMessage(Component.translatable("gui.maid_useful_task.mine.count").append(": ").append(String.valueOf(getCount())));
+        }
+
+        @Override
+        protected void applyValue() {
+            int count = getCount();
+            if (count != lastSentCount) {
+                lastSentCount = count;
+                currentData.targetCount(count);
+                currentData.resetRemaining();
+                MaidConfigurePacket.send(MaidMineConfigGui.this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(count));
+                MaidConfigurePacket.send(MaidMineConfigGui.this.maid, MaidMineConfig.LOCATION, "remainingCount", String.valueOf(count));
+            }
+        }
+
+        private int getCount() {
+            return MIN_COUNT + (int) Math.round(this.value * (MAX_COUNT - MIN_COUNT));
+        }
+
+        private void setCount(int count) {
+            int clamped = Math.max(MIN_COUNT, Math.min(MAX_COUNT, count));
+            this.value = toSliderValueStatic(clamped);
+            updateMessage();
+        }
+
+        private static double toSliderValueStatic(int count) {
+            int clamped = Math.max(MIN_COUNT, Math.min(MAX_COUNT, count));
+            return (clamped - MIN_COUNT) / (double) (MAX_COUNT - MIN_COUNT);
+        }
     }
 
     // ==========================================
@@ -136,8 +188,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 if (block == Blocks.AIR) {
                     continue;
                 }
-                // 修复：使用 NeoForge 的 Tags.Blocks.ORES
-                if (!block.defaultBlockState().is(Tags.Blocks.ORES)) {
+                if (!isSelectableBlock(block)) {
                     continue;
                 }
                 ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
@@ -179,7 +230,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
 
             @Override
             public void render(@NotNull GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
-                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 2, y + 2, 0xFFFFFF, false);
+                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 33, y + 2, 0xFFFFFF, false);
             }
 
             @Override
@@ -188,6 +239,16 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 MaidMineConfigGui.this.selectOre(id);
                 return true;
             }
+        }
+
+        private boolean isSelectableBlock(Block block) {
+            if (block.defaultBlockState().is(Tags.Blocks.ORES)) {
+                return true;
+            }
+            if (block == Blocks.CLAY) {
+                return true;
+            }
+            return block.defaultBlockState().is(BlockTags.DIRT) || block.defaultBlockState().is(BlockTags.BASE_STONE_OVERWORLD);
         }
     }
 }

@@ -20,6 +20,9 @@
   "gui.maid_useful_task.logging.skip_non_nature": "跳过非自然原木",
   "gui.maid_useful_task.mine.search": "检索矿物",
   "gui.maid_useful_task.mine.count": "数量",
+  "gui.maid_useful_task.mine.range": "范围",
   "message.maid_useful_task.mine.no_ore": "附近没有矿石。",
-  "message.maid_useful_task.mine.tool_insufficient": "镐子等级不够，无法挖该矿石。"
+  "message.maid_useful_task.mine.tool_insufficient": "镐子等级不够，无法挖该矿石。",
+  "message.maid_useful_task.mine.path_blocked": "矿物被阻挡，无法找到可行路径。",
+  "message.maid_useful_task.mine.path_too_far": "矿物路径超出主人半径16，无法前往。"
 }
