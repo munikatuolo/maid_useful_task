@@ -4,6 +4,7 @@ import com.github.tartaricacid.touhoulittlemaid.client.gui.entity.maid.task.Maid
 import com.github.tartaricacid.touhoulittlemaid.inventory.container.task.TaskConfigContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -33,9 +34,12 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     private static final int COUNT_BOX_WIDTH = 30;
     private static final int START_LEFT_OFFSET = 87;
     private static final int START_TOP_OFFSET = 36;
+    private static final int SLIDER_HEIGHT = 20;
+    private static final int LIST_TOP_OFFSET = 46;
     private MaidMineConfig.Data currentData;
     private EditBox searchBox;
     private EditBox countBox;
+    private CountSlider countSlider;
     private OreList oreList;
     private int lastSentCount;
 
@@ -73,8 +77,12 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         this.countBox.setResponder(this::updateCount);
         this.addRenderableWidget(this.countBox);
 
-        // 修改：构造函数只传 5 个参数，去掉了用不到的 bottom (top + 24 + LIST_HEIGHT)
-        this.oreList = new OreList(this.minecraft, LIST_WIDTH, LIST_HEIGHT, top + 24, 18);
+        int sliderWidth = TEXT_BOX_WIDTH + 8 + COUNT_BOX_WIDTH;
+        this.countSlider = new CountSlider(left, top + 20, sliderWidth, SLIDER_HEIGHT, this.currentData.targetCount());
+        this.addRenderableWidget(this.countSlider);
+
+        // 修改：构造函数只传 5 个参数，去掉了用不到的 bottom (top + LIST_TOP_OFFSET + LIST_HEIGHT)
+        this.oreList = new OreList(this.minecraft, LIST_WIDTH, LIST_HEIGHT, top + LIST_TOP_OFFSET, 18);
         this.oreList.setLeftPos(left);
         this.oreList.refreshList("");
         this.addRenderableWidget(this.oreList);
@@ -102,11 +110,15 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
             if (parsed <= 0) {
                 return;
             }
+            parsed = Math.min(parsed, 64);
             if (parsed != lastSentCount) {
                 lastSentCount = parsed;
                 currentData.targetCount(parsed);
                 currentData.resetRemaining();
                 MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(parsed));
+                if (countSlider != null) {
+                    countSlider.setCount(parsed);
+                }
             }
         } catch (NumberFormatException ignored) {
         }
@@ -116,6 +128,48 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         currentData.oreId(id.toString());
         currentData.resetRemaining();
         MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "oreId", id.toString());
+    }
+
+    private class CountSlider extends AbstractSliderButton {
+        private static final int MIN_COUNT = 1;
+        private static final int MAX_COUNT = 64;
+
+        protected CountSlider(int x, int y, int width, int height, int initialCount) {
+            super(x, y, width, height, Component.empty(), toSliderValue(initialCount));
+            updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            this.setMessage(Component.translatable("gui.maid_useful_task.mine.count").append(": ").append(String.valueOf(getCount())));
+        }
+
+        @Override
+        protected void applyValue() {
+            int count = getCount();
+            if (count != lastSentCount) {
+                lastSentCount = count;
+                currentData.targetCount(count);
+                currentData.resetRemaining();
+                MaidConfigurePacket.send(MaidMineConfigGui.this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(count));
+                countBox.setValue(String.valueOf(count));
+            }
+        }
+
+        private int getCount() {
+            return MIN_COUNT + (int) Math.round(this.value * (MAX_COUNT - MIN_COUNT));
+        }
+
+        private void setCount(int count) {
+            int clamped = Math.max(MIN_COUNT, Math.min(MAX_COUNT, count));
+            this.value = toSliderValue(clamped);
+            updateMessage();
+        }
+
+        private double toSliderValue(int count) {
+            int clamped = Math.max(MIN_COUNT, Math.min(MAX_COUNT, count));
+            return (clamped - MIN_COUNT) / (double) (MAX_COUNT - MIN_COUNT);
+        }
     }
 
     // ==========================================

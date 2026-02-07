@@ -43,7 +43,9 @@ import java.util.Optional;
 
 public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(MaidUsefulTask.MODID, "maid_mine");
-    public static final int OWNER_RANGE = 16;
+    public static int ownerRange() {
+        return Config.mineRange;
+    }
 
     @Override
     public ResourceLocation getUid() {
@@ -138,10 +140,14 @@ public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
     public boolean tryDestroyBlock(EntityMaid maid, BlockPos blockPos) {
         BlockState blockState = maid.level().getBlockState(blockPos);
         if (IMaidBlockDestroyTask.super.tryDestroyBlock(maid, blockPos)) {
-            if (isTargetOre(blockState, MaidMineConfig.get(maid))) {
-                MaidMineConfig.get(maid).consumeOne();
+        if (isTargetOre(blockState, MaidMineConfig.get(maid))) {
+            MaidMineConfig.Data data = MaidMineConfig.get(maid);
+            data.consumeOne();
+            if (data.remainingCount() <= 0) {
+                MaidUtils.switchToIdleTask(maid);
             }
-            return true;
+        }
+        return true;
         }
         return false;
     }
@@ -179,7 +185,8 @@ public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
         if (owner == null) {
             return false;
         }
-        return pos.getCenter().distanceToSqr(owner.position()) <= OWNER_RANGE * OWNER_RANGE;
+        int range = ownerRange();
+        return pos.getCenter().distanceToSqr(owner.position()) <= range * range;
     }
 
     private boolean hasCorrectTool(EntityMaid maid, BlockState blockState, MaidMineConfig.Data data) {
@@ -235,6 +242,18 @@ public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
             }
         }
         return false;
+    }
+
+    public boolean hasSamePlaneAdjacentOre(EntityMaid maid, BlockPos pos) {
+        MaidMineConfig.Data data = MaidMineConfig.get(maid);
+        BlockPos north = pos.north();
+        BlockPos south = pos.south();
+        BlockPos east = pos.east();
+        BlockPos west = pos.west();
+        return isTargetOre(maid.level().getBlockState(north), data)
+                || isTargetOre(maid.level().getBlockState(south), data)
+                || isTargetOre(maid.level().getBlockState(east), data)
+                || isTargetOre(maid.level().getBlockState(west), data);
     }
 
     @Override

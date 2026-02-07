@@ -13,7 +13,7 @@ import studio.fantasyit.maid_useful_task.util.MemoryUtil;
 public class MaidMineMoveBehavior extends DestoryBlockMoveBehavior {
     @Override
     protected double getOwnerSearchRadius(EntityMaid maid) {
-        return MaidMineTask.OWNER_RANGE;
+        return MaidMineTask.ownerRange();
     }
 
     @Override
@@ -23,15 +23,15 @@ public class MaidMineMoveBehavior extends DestoryBlockMoveBehavior {
             data.resetRemaining();
         }
         data.toolInsufficient(false);
-        this.setSearchRange(MaidMineTask.OWNER_RANGE);
+        this.setSearchRange(MaidMineTask.ownerRange());
         super.start(level, maid, gameTime);
         if (MemoryUtil.getTargetPos(maid) == null && data.remainingCount() > 0 && !data.toolInsufficient() && data.shouldWarnNoOre(level.getGameTime())) {
             LivingEntity owner = maid.getOwner();
             if (owner instanceof Player player) {
                 MaidMineTask task = (MaidMineTask) maid.getTask();
-                if (task.hasTargetOreInRange(level, player.blockPosition(), MaidMineTask.OWNER_RANGE, data)) {
+                if (task.hasTargetOreInRange(level, player.blockPosition(), MaidMineTask.ownerRange(), data)) {
                     MaidUtils.notifyOwnerWithBubble(maid, MaidMineTask.pathBlockedMessage());
-                } else if (task.hasTargetOreInRange(level, player.blockPosition(), MaidMineTask.OWNER_RANGE * 2, data)) {
+                } else if (task.hasTargetOreInRange(level, player.blockPosition(), MaidMineTask.ownerRange() * 2, data)) {
                     MaidUtils.notifyOwnerWithBubble(maid, MaidMineTask.pathTooFarMessage());
                 } else {
                     MaidUtils.notifyOwnerWithBubble(maid, MaidMineTask.noOreMessage());

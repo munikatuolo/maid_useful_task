@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import studio.fantasyit.maid_useful_task.memory.CurrentWork;
 import studio.fantasyit.maid_useful_task.task.IMaidBlockDestroyTask;
+import studio.fantasyit.maid_useful_task.task.MaidMineTask;
 import studio.fantasyit.maid_useful_task.util.Conditions;
 import studio.fantasyit.maid_useful_task.util.MemoryUtil;
 import studio.fantasyit.maid_useful_task.util.PosUtils;
@@ -57,7 +58,8 @@ public class DestoryBlockMoveBehavior extends MaidCenterMoveToBlockTask {
         if (blockPos instanceof BlockPos.MutableBlockPos mb) {
             List<BlockPos> bestList = null;
             BlockPos bestPos = null;
-            int bestBreakCount = Integer.MAX_VALUE;
+            int bestObstacleCount = Integer.MAX_VALUE;
+            boolean bestAdjacentSamePlane = false;
             double bestDistance = Double.MAX_VALUE;
             for (int dx = 0; dx < task.reachDistance(); dx = dx <= 0 ? 1 - dx : -dx) {
                 for (int dy = 0; dy < task.reachDistance(); dy = dy <= 0 ? 1 - dy : -dy) {
@@ -72,10 +74,17 @@ public class DestoryBlockMoveBehavior extends MaidCenterMoveToBlockTask {
                         if (pos.equals(entityMaid.blockPosition()) || (entityMaid.isWithinRestriction(pos) && pathfindingBFS.canPathReach(pos))) {
                             List<BlockPos> candidate = task.toDestroyFromStanding(entityMaid, targetPos, pos);
                             if (candidate != null) {
-                                int breakCount = candidate.size();
+                                int obstacleCount = Math.max(0, candidate.size() - 1);
+                                boolean adjacentSamePlane = false;
+                                if (task instanceof MaidMineTask mineTask) {
+                                    adjacentSamePlane = mineTask.hasSamePlaneAdjacentOre(entityMaid, targetPos);
+                                }
                                 double distance = pos.distSqr(entityMaid.blockPosition());
-                                if (breakCount < bestBreakCount || (breakCount == bestBreakCount && distance < bestDistance)) {
-                                    bestBreakCount = breakCount;
+                                if (adjacentSamePlane && !bestAdjacentSamePlane
+                                        || (adjacentSamePlane == bestAdjacentSamePlane && obstacleCount < bestObstacleCount)
+                                        || (adjacentSamePlane == bestAdjacentSamePlane && obstacleCount == bestObstacleCount && distance < bestDistance)) {
+                                    bestAdjacentSamePlane = adjacentSamePlane;
+                                    bestObstacleCount = obstacleCount;
                                     bestDistance = distance;
                                     bestList = candidate;
                                     bestPos = pos.immutable();
