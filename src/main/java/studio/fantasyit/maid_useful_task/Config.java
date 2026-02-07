@@ -24,7 +24,7 @@ public class Config {
     private static final ModConfigSpec.BooleanValue ENABLE_MINE = BUILDER
             .define("functions.mine", true);
     private static final ModConfigSpec.IntValue MINE_RANGE = BUILDER
-            .defineInRange("mine.range", 16, 1, 64);
+            .defineInRange("mine.range", 16, 1, 128);
 
     private static final ModConfigSpec.BooleanValue ENABLE_REVIVE_AGGRO = BUILDER
             .define("revive.aggro", false);
