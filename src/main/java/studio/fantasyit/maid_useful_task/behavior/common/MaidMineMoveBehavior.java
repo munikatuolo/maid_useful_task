@@ -19,6 +19,9 @@ public class MaidMineMoveBehavior extends DestoryBlockMoveBehavior {
     @Override
     protected void start(@NotNull ServerLevel level, @NotNull EntityMaid maid, long gameTime) {
         MaidMineConfig.Data data = MaidMineConfig.get(maid);
+        if (data.remainingCount() <= 0) {
+            data.resetRemaining();
+        }
         data.toolInsufficient(false);
         this.setSearchRange(MaidMineTask.OWNER_RANGE);
         super.start(level, maid, gameTime);
