@@ -30,6 +30,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     private static final int TEXT_BOX_WIDTH = 120;
     private static final int TEXT_BOX_HEIGHT = 16;
     private static final int COUNT_BOX_WIDTH = 30;
+    private static final int START_LEFT_OFFSET = 87;
+    private static final int START_TOP_OFFSET = 36;
     private MaidMineConfig.Data currentData;
     private EditBox searchBox;
     private EditBox countBox;
@@ -54,8 +56,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     @Override
     protected void initAdditionWidgets() {
         super.initAdditionWidgets();
-        int left = leftPos + 8;
-        int top = topPos + 24;
+        int left = leftPos + START_LEFT_OFFSET;
+        int top = topPos + START_TOP_OFFSET;
 
         this.searchBox = new EditBox(this.font, left, top, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.search"));
         this.searchBox.setMaxLength(64);
@@ -80,8 +82,8 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     @Override
     protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
-        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.search"), 8 + TEXT_BOX_WIDTH / 2, 8, 0x404040);
-        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.count"), 8 + TEXT_BOX_WIDTH + 8 + COUNT_BOX_WIDTH / 2, 8, 0x404040);
+        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.search"), START_LEFT_OFFSET + TEXT_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
+        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.count"), START_LEFT_OFFSET + TEXT_BOX_WIDTH + 8 + COUNT_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
     }
 
     private void updateFilter(String value) {
