@@ -7,18 +7,32 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import studio.fantasyit.maid_useful_task.data.MaidMineConfig;
 import studio.fantasyit.maid_useful_task.task.MaidMineTask;
+import studio.fantasyit.maid_useful_task.util.MaidUtils;
 import studio.fantasyit.maid_useful_task.util.MemoryUtil;
 
 public class MaidMineMoveBehavior extends DestoryBlockMoveBehavior {
     @Override
+    protected double getOwnerSearchRadius(EntityMaid maid) {
+        return MaidMineTask.OWNER_RANGE;
+    }
+
+    @Override
     protected void start(@NotNull ServerLevel level, @NotNull EntityMaid maid, long gameTime) {
         MaidMineConfig.Data data = MaidMineConfig.get(maid);
         data.toolInsufficient(false);
+        this.setSearchRange(MaidMineTask.OWNER_RANGE);
         super.start(level, maid, gameTime);
         if (MemoryUtil.getTargetPos(maid) == null && data.remainingCount() > 0 && !data.toolInsufficient() && data.shouldWarnNoOre(level.getGameTime())) {
             LivingEntity owner = maid.getOwner();
             if (owner instanceof Player player) {
-                player.displayClientMessage(MaidMineTask.noOreMessage(), false);
+                MaidMineTask task = (MaidMineTask) maid.getTask();
+                if (task.hasTargetOreInRange(level, player.blockPosition(), MaidMineTask.OWNER_RANGE, data)) {
+                    MaidUtils.notifyOwnerWithBubble(maid, MaidMineTask.pathBlockedMessage());
+                } else if (task.hasTargetOreInRange(level, player.blockPosition(), MaidMineTask.OWNER_RANGE * 2, data)) {
+                    MaidUtils.notifyOwnerWithBubble(maid, MaidMineTask.pathTooFarMessage());
+                } else {
+                    MaidUtils.notifyOwnerWithBubble(maid, MaidMineTask.noOreMessage());
+                }
             }
         }
     }

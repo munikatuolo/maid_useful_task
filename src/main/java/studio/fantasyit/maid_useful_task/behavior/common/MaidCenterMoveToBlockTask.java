@@ -81,11 +81,15 @@ abstract public class MaidCenterMoveToBlockTask extends Behavior<EntityMaid> {
         return MaidUtils.getMaidRestrictCenter(maid);
     }
 
+    protected double getOwnerSearchRadius(EntityMaid maid) {
+        return 8.0;
+    }
+
     private boolean checkOwnerPos(EntityMaid maid, BlockPos mutableBlockPos) {
         if (maid.isHomeModeEnable()) {
             return true;
         } else {
-            return maid.getOwner() != null && mutableBlockPos.closerToCenterThan(maid.getOwner().position(), 8.0);
+            return maid.getOwner() != null && mutableBlockPos.closerToCenterThan(maid.getOwner().position(), getOwnerSearchRadius(maid));
         }
     }
 

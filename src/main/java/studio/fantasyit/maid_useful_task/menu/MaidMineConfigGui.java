@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Locale;
 
 public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Container> {
-    private static final int LIST_HEIGHT = 70;
-    private static final int LIST_WIDTH = 154;
-    private static final int TEXT_BOX_WIDTH = 120;
-    private static final int TEXT_BOX_HEIGHT = 16;
+    private static final int LIST_HEIGHT = 58;
+    private static final int LIST_WIDTH = 138;
+    private static final int TEXT_BOX_WIDTH = 100;
+    private static final int TEXT_BOX_HEIGHT = 14;
     private MaidMineConfig.Data currentData;
     private EditBox searchBox;
     private EditBox countBox;
@@ -62,7 +62,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         this.searchBox.setResponder(this::updateFilter);
         this.addRenderableWidget(this.searchBox);
 
-        this.countBox = new EditBox(this.font, left + TEXT_BOX_WIDTH + 8, top, 30, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.count"));
+        this.countBox = new EditBox(this.font, left + TEXT_BOX_WIDTH + 6, top, 26, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.count"));
         this.countBox.setMaxLength(4);
         this.countBox.setValue(String.valueOf(this.currentData.targetCount()));
         this.lastSentCount = this.currentData.targetCount();
@@ -80,7 +80,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         guiGraphics.drawString(this.font, Component.translatable("gui.maid_useful_task.mine.search"), 8, 8, 0x404040, false);
-        guiGraphics.drawString(this.font, Component.translatable("gui.maid_useful_task.mine.count"), 8 + TEXT_BOX_WIDTH + 8, 8, 0x404040, false);
+        guiGraphics.drawString(this.font, Component.translatable("gui.maid_useful_task.mine.count"), 8 + TEXT_BOX_WIDTH + 6, 8, 0x404040, false);
     }
 
     private void updateFilter(String value) {
