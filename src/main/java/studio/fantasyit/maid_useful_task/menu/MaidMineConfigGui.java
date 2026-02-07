@@ -10,6 +10,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -139,8 +140,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 if (block == Blocks.AIR) {
                     continue;
                 }
-                // 修复：使用 NeoForge 的 Tags.Blocks.ORES
-                if (!block.defaultBlockState().is(Tags.Blocks.ORES)) {
+                if (!isSelectableBlock(block)) {
                     continue;
                 }
                 ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
@@ -182,7 +182,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
 
             @Override
             public void render(@NotNull GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
-                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 2, y + 2, 0xFFFFFF, false);
+                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 10, y + 2, 0xFFFFFF, false);
             }
 
             @Override
@@ -191,6 +191,16 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 MaidMineConfigGui.this.selectOre(id);
                 return true;
             }
+        }
+
+        private boolean isSelectableBlock(Block block) {
+            if (block.defaultBlockState().is(Tags.Blocks.ORES)) {
+                return true;
+            }
+            if (block == Blocks.CLAY) {
+                return true;
+            }
+            return block.defaultBlockState().is(BlockTags.DIRT) || block.defaultBlockState().is(BlockTags.BASE_STONE_OVERWORLD);
         }
     }
 }
