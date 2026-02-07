@@ -9,7 +9,7 @@ import studio.fantasyit.maid_useful_task.menu.MaidLoggingConfigGui;
 import studio.fantasyit.maid_useful_task.menu.MaidMineConfigGui;
 import studio.fantasyit.maid_useful_task.menu.MaidReviveConfigGui;
 
-@EventBusSubscriber(modid = MaidUsefulTask.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = MaidUsefulTask.MODID, value = Dist.CLIENT)
 public class ClientGuiRegistry {
     @SubscribeEvent
     public static void init(RegisterMenuScreensEvent event) {
