@@ -228,7 +228,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
 
             @Override
             public void render(@NotNull GuiGraphics guiGraphics, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
-                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 10, y + 2, 0xFFFFFF, false);
+                guiGraphics.drawString(MaidMineConfigGui.this.font, name, x + 33, y + 2, 0xFFFFFF, false);
             }
 
             @Override
