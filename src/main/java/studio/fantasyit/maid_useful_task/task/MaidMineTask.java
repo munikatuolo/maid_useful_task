@@ -43,7 +43,11 @@ import java.util.Optional;
 
 public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
     public static final ResourceLocation UID = ResourceLocation.fromNamespaceAndPath(MaidUsefulTask.MODID, "maid_mine");
-    public static int ownerRange() {
+    public static int ownerRange(EntityMaid maid) {
+        MaidMineConfig.Data data = MaidMineConfig.get(maid);
+        if (data.mineRange() > 0) {
+            return data.mineRange();
+        }
         return Config.mineRange;
     }
 
@@ -185,7 +189,7 @@ public class MaidMineTask implements IMaidTask, IMaidBlockDestroyTask {
         if (owner == null) {
             return false;
         }
-        int range = ownerRange();
+        int range = ownerRange(maid);
         return pos.getCenter().distanceToSqr(owner.position()) <= range * range;
     }
 

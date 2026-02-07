@@ -31,14 +31,14 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     private static final int LIST_WIDTH = 154;
     private static final int TEXT_BOX_WIDTH = 120;
     private static final int TEXT_BOX_HEIGHT = 16;
-    private static final int COUNT_BOX_WIDTH = 30;
+    private static final int RANGE_BOX_WIDTH = 30;
     private static final int START_LEFT_OFFSET = 87;
     private static final int START_TOP_OFFSET = 36;
     private static final int SLIDER_HEIGHT = 20;
     private static final int LIST_TOP_OFFSET = 46;
     private MaidMineConfig.Data currentData;
     private EditBox searchBox;
-    private EditBox countBox;
+    private EditBox rangeBox;
     private CountSlider countSlider;
     private OreList oreList;
     private int lastSentCount;
@@ -70,14 +70,14 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         this.searchBox.setResponder(this::updateFilter);
         this.addRenderableWidget(this.searchBox);
 
-        this.countBox = new EditBox(this.font, left + TEXT_BOX_WIDTH + 8, top, COUNT_BOX_WIDTH, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.count"));
-        this.countBox.setMaxLength(4);
-        this.countBox.setValue(String.valueOf(this.currentData.targetCount()));
+        this.rangeBox = new EditBox(this.font, left + TEXT_BOX_WIDTH + 8, top, RANGE_BOX_WIDTH, TEXT_BOX_HEIGHT, Component.translatable("gui.maid_useful_task.mine.range"));
+        this.rangeBox.setMaxLength(4);
+        this.rangeBox.setValue(String.valueOf(this.currentData.mineRange()));
+        this.rangeBox.setResponder(this::updateRange);
+        this.addRenderableWidget(this.rangeBox);
         this.lastSentCount = this.currentData.targetCount();
-        this.countBox.setResponder(this::updateCount);
-        this.addRenderableWidget(this.countBox);
 
-        int sliderWidth = TEXT_BOX_WIDTH + 8 + COUNT_BOX_WIDTH;
+        int sliderWidth = TEXT_BOX_WIDTH + 8 + RANGE_BOX_WIDTH;
         this.countSlider = new CountSlider(left, top + 20, sliderWidth, SLIDER_HEIGHT, this.currentData.targetCount());
         this.addRenderableWidget(this.countSlider);
 
@@ -92,7 +92,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
     protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.search"), START_LEFT_OFFSET + TEXT_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
-        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.count"), START_LEFT_OFFSET + TEXT_BOX_WIDTH + 8 + COUNT_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
+        guiGraphics.drawCenteredString(this.font, Component.translatable("gui.maid_useful_task.mine.range"), START_LEFT_OFFSET + TEXT_BOX_WIDTH + 8 + RANGE_BOX_WIDTH / 2, START_TOP_OFFSET - 16, 0x404040);
     }
 
     private void updateFilter(String value) {
@@ -101,7 +101,7 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
         }
     }
 
-    private void updateCount(String value) {
+    private void updateRange(String value) {
         if (value == null || value.isBlank()) {
             return;
         }
@@ -110,16 +110,9 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
             if (parsed <= 0) {
                 return;
             }
-            parsed = Math.min(parsed, 64);
-            if (parsed != lastSentCount) {
-                lastSentCount = parsed;
-                currentData.targetCount(parsed);
-                currentData.resetRemaining();
-                MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(parsed));
-                if (countSlider != null) {
-                    countSlider.setCount(parsed);
-                }
-            }
+            parsed = Math.min(parsed, 128);
+            currentData.mineRange(parsed);
+            MaidConfigurePacket.send(this.maid, MaidMineConfig.LOCATION, "mineRange", String.valueOf(parsed));
         } catch (NumberFormatException ignored) {
         }
     }
@@ -152,7 +145,6 @@ public class MaidMineConfigGui extends MaidTaskConfigGui<MaidMineConfigGui.Conta
                 currentData.targetCount(count);
                 currentData.resetRemaining();
                 MaidConfigurePacket.send(MaidMineConfigGui.this.maid, MaidMineConfig.LOCATION, "targetCount", String.valueOf(count));
-                countBox.setValue(String.valueOf(count));
             }
         }
 

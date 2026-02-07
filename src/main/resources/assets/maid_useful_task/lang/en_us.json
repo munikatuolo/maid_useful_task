@@ -20,6 +20,7 @@
   "gui.maid_useful_task.logging.skip_non_nature": "Skip Non-nature Logs",
   "gui.maid_useful_task.mine.search": "Search Ore",
   "gui.maid_useful_task.mine.count": "Count",
+  "gui.maid_useful_task.mine.range": "Range",
   "message.maid_useful_task.mine.no_ore": "No ores nearby.",
   "message.maid_useful_task.mine.tool_insufficient": "My pickaxe isn't strong enough to mine that ore.",
   "message.maid_useful_task.mine.path_blocked": "The ore is blocked and no valid path could be found.",
